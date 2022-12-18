@@ -1,70 +1,67 @@
-with open('test.txt') as f:
+with open('inputs/day9.txt') as f:
     lines = f.readlines()
 
-
-
-def check_pos(x_head,y_head,x_tail,y_tail):
-    if abs(x_head-x_tail) == 1 and abs(y_head-y_tail) == 1:
-        return 0
-    elif abs(x_head-x_tail) == 2 or abs(y_head-y_tail) == 2:
-        return 2
-    else:
-        return 1
-
-x_head,y_head = 0,0
-x_tail,y_tail = -1,-1
-tail_positions = []
+    
+head = [0,0]   
+tail = [0,0]
+positions_tail = []
 for l in lines:
     direction = l.split(" ")[0]
     val = int(l.split(" ")[-1])
     print(l)
-    print(x_head,y_head)
-    print(x_tail,y_tail)
-    print()
-
-    for v in range(1,val+1):
+    for v in range(0,val):
         if direction == 'U':
-            y_head += 1
-            cp = check_pos(x_head,y_head,x_tail,y_tail)
-            if cp == 1:
-                y_tail+=1
-            elif cp == 2:
-                x_tail = x_head
-                y_tail = y_head-1
-
+            head = [head[0],head[1]+1]
         elif direction == 'D':
-            y_head -= 1
-            cp = check_pos(x_head,y_head,x_tail,y_tail)
-            if cp == 1:
-                y_tail-=1
-            elif cp == 2:
-                x_tail = x_head
-                y_tail = y_head+1
-
-        elif direction == 'L':
-            x_head -= 1
-            cp = check_pos(x_head,y_head,x_tail,y_tail)
-            if cp == 1:
-                x_tail-=1
-            elif cp == 2:
-                x_tail = x_head+1
-                y_tail = y_head
-                
+            head = [head[0],head[1]-1]
         elif direction == 'R':
-            x_head += 1
-            cp = check_pos(x_head,y_head,x_tail,y_tail)
-            if cp == 1:
-                x_tail+=1
-            elif cp == 2:
-                x_tail = x_head-1
-                y_tail = y_head
-                
-        tail_pos = (x_tail,y_tail)
-        head_pos = (x_head,y_head)
-        if tail_pos not in tail_positions:
-            tail_positions.append(tail_pos)
-        print()
-        print(head_pos)
-        print(tail_pos)
-print(f'Number of diff tail positions: {len(tail_positions)}')
-print(tail_positions)
+            head = [head[0]+1,head[1]]
+        elif direction == 'L':
+            head = [head[0]-1,head[1]]
+        print(f'New Head Position: {head}')
+        print(f'Current Tail Position: {tail}')     
+        dif_x = head[0]-tail[0]
+        dif_y = head[1]-tail[1]
+        print(f'Dif x {dif_x} | Dif y {dif_y}')
+        if dif_x < 0:
+            move_x = dif_x + 1
+        else:
+            move_x = dif_x - 1
+
+        if dif_y < 0:
+            move_y = dif_y + 1
+        else:
+            move_y = dif_y - 1
+
+        if dif_y in [1,-1] and dif_x in [1,-1]:
+            print("ok, touching diagonally")
+        elif (dif_x in [0,1,-1] and dif_y == 0) or (dif_y in [0,1,-1] and dif_x == 0):
+            print("ok, touching sideways")
+        elif dif_x in [2,-2] and dif_y==0:
+            print("Move horizontal")
+            tail = [tail[0]+move_x,tail[1]]
+            print(f'New Tail Position {tail}') 
+        elif dif_y in [2,-2] and dif_x==0:
+            print("Move vertical")
+            tail = [tail[0],tail[1]+move_y]
+            print(f'New Tail Position {tail}') 
+        elif dif_y in [2,-2] and dif_x in [1,-1]:
+            print("Move diagonal and vertical")
+            tail = [head[0], tail[1]+move_y]
+        elif dif_x in [2,-2] and dif_y in [1,-1]:
+            print("Move diagonal and horizontal")
+            tail = [tail[0]+move_x, head[1]]
+        print(f'Head: {head}. Tail: {tail}\n')     
+
+        positions_tail.append(tail)
+
+unique_pos_tail = []
+unique_counter = 0
+for p in positions_tail:
+    if p not in unique_pos_tail:
+        unique_pos_tail.append(p)
+        unique_counter +=1
+
+print(f'All Positions Tail: {positions_tail}')
+print(f'Unique Positions Tail: {unique_pos_tail}')
+print(f'Total Unique Positions Tail: {unique_counter}')
